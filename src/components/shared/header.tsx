@@ -15,10 +15,10 @@ export default function Header() {
         </a>
 
         <nav className="hidden items-center space-x-6 md:flex">
-          <a href="/menu" className="font-medium hover:underline">
+          {/* <a href="/menu" className="font-medium hover:underline">
             MENU
-          </a>
-          <a href="/gioi-thieu" className="font-medium hover:underline">
+          </a> */}
+          <a href="/" className="font-medium hover:underline">
             GIỚI THIỆU
           </a>
 
@@ -28,17 +28,17 @@ export default function Header() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" className="bg-white">
               <DropdownMenuItem>
-                <a href="/san-pham/thuc-an" className="w-full">
+                <a href="/product" className="w-full">
                   Thức ăn cho thú cưng
                 </a>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <a href="/san-pham/phu-kien" className="w-full">
+                <a href="/product" className="w-full">
                   Phụ kiện
                 </a>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <a href="/san-pham/do-choi" className="w-full">
+                <a href="/product" className="w-full">
                   Đồ chơi
                 </a>
               </DropdownMenuItem>

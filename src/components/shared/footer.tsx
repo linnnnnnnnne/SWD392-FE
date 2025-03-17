@@ -4,7 +4,7 @@ import { Input } from '../ui/input';
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-pink-600 py-8 text-white">
+    <footer className="relative w-full bg-pink-600 py-8 text-white">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           <div>
@@ -71,16 +71,16 @@ export default function Footer() {
                 />
               </div>
               <Button className="h-10 bg-green-500 hover:bg-green-600">
-                Gửi đi
+                Gửi
               </Button>
             </div>
             <div className="mt-8">
               <img
-                src="/placeholder.svg?height=100&width=200"
+                src="https://cdn.builder.io/api/v1/image/assets/TEMP/408a118b9519d2ddb8534902f4d026173d2a0dc7f4707244942b142d59382974?placeholderIfAbsent=true&apiKey=87394bd0cd7a4add8bf680009e12faa5"
                 alt="Cat"
-                width={200}
-                height={100}
-                className="h-auto w-32"
+                width={300}
+                height={200}
+                className="absolute bottom-0 right-10 h-auto w-48"
               />
             </div>
           </div>
