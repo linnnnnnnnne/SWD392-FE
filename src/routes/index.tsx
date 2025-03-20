@@ -13,6 +13,8 @@ const StorePage = lazy(() => import('@/pages/Store/index'));
 const StoreDetailPage = lazy(() => import('@/pages/StoreDetail/index'));
 const PetService = lazy(() => import('@/pages/PetService/index'));
 const BookingPage = lazy(() => import('@/pages/BookingPage/index'));
+const SigninPage = lazy(() => import('@/pages/auth/signin/index'));
+const SignUpPage = lazy(() => import('@/pages/auth/signup/index'));
 
 // ----------------------------------------------------------------------
 
@@ -56,6 +58,14 @@ export default function AppRouter() {
         {
           path: '/booking',
           element: <BookingPage />
+        },
+        {
+          path: '/login',
+          element: <SigninPage />
+        },
+        {
+          path: '/signup',
+          element: <SignUpPage />
         }
       ]
     }

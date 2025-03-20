@@ -2,66 +2,67 @@ import UserAuthForm from './components/user-auth-form';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { FcGoogle } from 'react-icons/fc';
+import { FaApple } from 'react-icons/fa';
+import loginImage from '@/assets/login.jpg';
 
 export default function SignInPage() {
   return (
-    <div className="relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-      <Link
-        to="/"
-        className={cn(
-          buttonVariants({ variant: 'ghost' }),
-          'absolute right-4 top-4 hidden md:right-8 md:top-8'
-        )}
-      >
-        Login
-      </Link>
-      <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r  lg:flex">
-        <div className="absolute inset-0 bg-primary dark:bg-secondary" />
-        <div className="relative z-20 flex items-center text-lg font-medium">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mr-2 h-6 w-6"
-          >
-            <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
-          </svg>
-          Logo
-        </div>
-        <div className="relative z-20 mt-auto">
-          <blockquote className="space-y-2">
-            <p className="text-lg">
-              &ldquo;Happy Kids - Mầm non dành cho trẻ.&rdquo;
-            </p>
-            <footer className="text-sm">Nguyễn Đức Tuấn</footer>
-          </blockquote>
-        </div>
-      </div>
-      <div className="flex h-full items-center p-4 lg:p-8">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-          <div className="flex flex-col space-y-2 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">Đăng nhập</h1>
-            <p className="text-sm text-muted-foreground">
-              Nhập tài khoản của bạn để tiếp tục
-            </p>
-          </div>
-          <UserAuthForm />
-          <p className="px-8 text-center text-sm text-muted-foreground">
-            Bằng cách tiếp tục, bạn đồng ý với{' '}
-            <a className="underline underline-offset-4 hover:text-primary">
-              điều khoản dịch vụ
-            </a>{' '}
-            và{' '}
-            <a className="underline underline-offset-4 hover:text-primary">
-              chính sách bảo mật
-            </a>{' '}
-            của Happy Kids .
+    <div className="flex h-screen bg-gray-100">
+      <div className="flex w-1/2 items-center justify-center">
+        <Card className="w-96 bg-white p-8 shadow-xl">
+          <h2 className="mb-2 text-2xl font-bold text-gray-800">
+            Welcome back!
+          </h2>
+          <p className="mb-6 text-gray-500">
+            Nhập thông tin xác thực của bạn để truy cập account của bạn
           </p>
-        </div>
+          <form className="space-y-4">
+            <Input
+              placeholder="Email address"
+              type="email"
+              className="w-full"
+            />
+            <Input placeholder="Password" type="password" className="w-full" />
+            <div className="flex items-center justify-between">
+              <label className="flex items-center text-sm text-gray-600">
+                <input type="checkbox" className="mr-2" /> Remember for 30 days
+              </label>
+              <a href="#" className="text-sm text-blue-500">
+                Forgot password?
+              </a>
+            </div>
+            <Button className="w-full bg-pink-500 text-white hover:bg-pink-600">
+              Login
+            </Button>
+          </form>
+          <div className="mt-6 text-center text-gray-500">Or</div>
+          <div className="mt-4 flex gap-2">
+            <Button className="flex w-1/2 items-center justify-center gap-2 border bg-white text-gray-800">
+              <FcGoogle /> Sign in with Google
+            </Button>
+            <Button className="flex w-1/2 items-center justify-center gap-2 border bg-white text-gray-800">
+              <FaApple /> Sign in with Apple
+            </Button>
+          </div>
+          <div className="mt-4 text-center">
+            Don't have an account?{' '}
+            <a href="#" className="text-blue-500">
+              Sign Up
+            </a>
+          </div>
+        </Card>
+      </div>
+      <div className="relative flex w-1/2 items-center justify-center bg-gray-200">
+        <img
+          src={loginImage}
+          alt="Pet Shop Login"
+          className="w-4/5 object-cover"
+        />
       </div>
     </div>
   );
