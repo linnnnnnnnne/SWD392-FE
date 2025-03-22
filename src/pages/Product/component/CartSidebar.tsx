@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
-import { formatCurrency } from '@/utilities/formatCurrency'; // hoặc bạn dùng hàm riêng
-import { useState } from 'react';
+import { formatCurrency } from '@/utilities/formatCurrency';
+import { useEffect } from 'react';
 
 interface CartSidebarProps {
   cart: { [key: string]: number };
@@ -16,13 +16,17 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
   onClose,
   onRemove
 }) => {
-  const [note, setNote] = useState('');
-  const [address, setAddress] = useState('');
-
   const totalPrice = products.reduce(
     (acc: number, p: any) => acc + (cart[p.id] || 0) * p.price,
     0
   );
+
+  // update trong localStorage
+  useEffect(() => {
+    if (Object.keys(cart).length > 0) {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+  }, [cart]);
 
   const handleCheckout = async () => {
     const orderData = {
@@ -33,16 +37,14 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
             ? {
                 id: product.id,
                 name: product.name,
-                imageUrl: product.imageUrl,
+                linkImage: product.linkImage,
                 quantity,
                 price: product.price
               }
             : null;
         })
         .filter(Boolean),
-      total: totalPrice,
-      note,
-      address
+      total: totalPrice
     };
 
     localStorage.setItem('orderData', JSON.stringify(orderData));
@@ -71,7 +73,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
                 className="flex items-center justify-between border-b pb-3"
               >
                 <img
-                  src={product.imageUrl}
+                  src={product.linkImage}
                   className="h-16 w-16 rounded-md object-cover"
                   alt={product.name}
                 />
@@ -88,7 +90,10 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
                 <Button
                   variant="destructive"
                   size="icon"
-                  onClick={() => onRemove(id)}
+                  onClick={() => {
+                    onRemove(id);
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                  }}
                   className="ml-2"
                 >
                   <X className="h-4 w-4" />
@@ -103,18 +108,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
         <p className="text-right text-xl font-bold">
           Tổng: {formatCurrency(totalPrice)}
         </p>
-        <textarea
-          className="mt-2 w-full rounded-md border p-2"
-          placeholder="Ghi chú..."
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-        />
-        <input
-          className="mt-2 w-full rounded-md border p-2"
-          placeholder="Địa chỉ giao hàng..."
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-        />
+
         <Button
           className="mt-4 w-full rounded-md bg-blue-500 py-2 text-white hover:bg-blue-600"
           onClick={handleCheckout}

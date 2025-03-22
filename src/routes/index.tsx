@@ -8,7 +8,7 @@ const SystemLayout = lazy(() => import('@/components/layout/layout'));
 // const HomePage = lazy(() => import('@/pages/Store/index'));
 const Home = lazy(() => import('@/pages/home/home'));
 const Product = lazy(() => import('@/pages/Product/pageProduct'));
-
+const ProductDetail = lazy(() => import('@/pages/Product/ProductDetail'));
 const StorePage = lazy(() => import('@/pages/Store/index'));
 const StoreDetailPage = lazy(() => import('@/pages/StoreDetail/index'));
 const PetService = lazy(() => import('@/pages/PetService/index'));
@@ -42,6 +42,10 @@ export default function AppRouter() {
         {
           path: '/product',
           element: <Product />
+        },
+        {
+          path: '/product-detail/:id', // Define the product detail route
+          element: <ProductDetail />
         },
         {
           path: '/store',

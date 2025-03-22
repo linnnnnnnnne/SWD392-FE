@@ -1,42 +1,34 @@
-/* pageProduct.tsx */
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Footer from '@/components/shared/footer';
-import { FilterSidebar } from './component/FilterSidebar';
 import { ProductGrid } from './component/ProductGrid';
 import { Pagination } from './component/Pagination';
 import { Button } from '@/components/ui/button';
 import { Heart, ShoppingCart, X, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-// import { Checkout } from './CheckoutPage';
 import { useProducts } from '@/hooks/useProducts';
 import { CartSidebar } from './component/CartSidebar';
 
-const categories = [
-  { name: 'Pet care', count: 18 },
-  { name: 'Clothing', count: 16 },
-  { name: 'Pet food', count: 40 },
-  { name: 'Toys', count: 18 }
-];
-
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND'
-  }).format(value);
-};
-
 export default function PageProduct() {
-  const searchParams = typeof window !== 'undefined' ? useSearchParams() : null;
-  const productType = searchParams ? searchParams.get('type') : null;
+  const getQueryParams = () => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('type');
+    }
+    return null;
+  };
+
+  const productType = getQueryParams();
+  console.log('ProductType from URL:', productType);
   const { products, loading, error } = useProducts(productType || undefined);
 
   const [cart, setCart] = useState<{ [key: string]: number }>({});
   const [isCartOpen, setIsCartOpen] = useState(false);
-  // const [isCheckout, setIsCheckout] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(8);
 
   useEffect(() => {
     const stored = localStorage.getItem('cart');
@@ -44,7 +36,9 @@ export default function PageProduct() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
+    if (Object.keys(cart).length > 0) {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
   }, [cart]);
 
   const increaseCartQuantity = (id: string) => {
@@ -70,6 +64,20 @@ export default function PageProduct() {
   };
 
   const totalItems = Object.values(cart).reduce((acc, qty) => acc + qty, 0);
+
+  // Xử lý phân trang
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = products.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const totalPages = Math.ceil(products.length / productsPerPage);
 
   return (
     <div className="relative overflow-hidden bg-white">
@@ -112,29 +120,40 @@ export default function PageProduct() {
       </div>
 
       <main
-        className={`mt-9 flex w-full flex-col pl-8 pr-20 max-md:max-w-full max-md:px-5 ${isCartOpen ? 'blur-sm' : ''}`}
+        className={`mt-9 flex flex-col pl-8 pr-8 max-md:px-5 ${isCartOpen ? 'blur-sm' : ''}`}
       >
         <div className="max-md:max-w-full">
-          <div className="flex gap-5 max-md:flex-col">
-            <FilterSidebar categories={categories} />
-            <section className="ml-5 w-[76%] max-md:ml-0 max-md:w-full">
-              <div className="mt-8 flex w-full flex-col items-center max-md:mt-10 max-md:max-w-full">
+          <div className="flex flex-wrap justify-center gap-5 max-md:flex-col">
+            <section className="w-[100%] max-md:w-full">
+              <div className="mt-8 flex w-full flex-col items-center">
                 {error ? (
                   <p className="text-center text-red-500">{error}</p>
                 ) : (
                   <ProductGrid
-                    products={products}
+                    products={currentProducts}
                     cart={cart}
                     increaseCartQuantity={increaseCartQuantity}
                     decreaseCartQuantity={decreaseCartQuantity}
                     removeFromCart={removeFromCart}
                   />
                 )}
-                {!error && <Pagination />}
+                {!error && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                )}
               </div>
             </section>
           </div>
         </div>
+
+        <img
+          src="https://cdn.builder.io/api/v1/image/assets/TEMP/4a48c0e3829bf068ab55a2ab61bdb0361f7df640ceac12a1d89e0635eaa1bec8?placeholderIfAbsent=true&apiKey=87394bd0cd7a4add8bf680009e12faa5"
+          className="mx-auto mb-0 mt-44 w-full max-w-[1234px] object-contain"
+          alt="Decorative element"
+        />
       </main>
       <Footer />
 
@@ -152,16 +171,6 @@ export default function PageProduct() {
           />
         </>
       )}
-
-      {/* {isCheckout && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <Checkout
-            cart={cart}
-            products={products}
-            onConfirmOrder={(method) => alert(`Đặt hàng với: ${method}`)}
-          />
-        </div>
-      )} */}
     </div>
   );
 }

@@ -2,12 +2,13 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface ProductCardProps {
   id: string;
   name: string;
   price: number;
-  imageUrl: string;
+  linkImage: string;
   size: number;
   status: number;
   quantity: number;
@@ -21,7 +22,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   id,
   name,
   price,
-  imageUrl,
+  linkImage,
   size,
   status,
   quantity,
@@ -30,6 +31,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onDecrease,
   onRemoveFromCart
 }) => {
+  const navigate = useNavigate();
+
+  const handleProductClick = () => {
+    navigate(`/product-detail/${id}`);
+  };
+
   const formatPrice = new Intl.NumberFormat('vi-VN', {
     style: 'currency',
     currency: 'VND'
@@ -39,9 +46,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     <article className="flex h-[460px] w-[320px] flex-col overflow-hidden rounded-lg border border-gray-200 bg-white p-4 shadow-lg">
       <div className="relative h-60 w-full">
         <img
-          src={imageUrl}
-          className="relative z-10 h-full w-full rounded-lg object-contain"
+          src={linkImage}
+          className="relative z-10 h-full w-full cursor-pointer rounded-lg object-contain"
           alt={name}
+          onClick={handleProductClick}
           onError={(e) => (e.currentTarget.style.display = 'none')}
         />
       </div>

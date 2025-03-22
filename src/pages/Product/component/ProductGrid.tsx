@@ -7,7 +7,7 @@ interface Product {
   id: string;
   name: string;
   price: number;
-  imageUrl: string;
+  linkImage: string;
   size: number;
   status: number;
 }
@@ -28,7 +28,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   removeFromCart
 }) => {
   return (
-    <div className="mt-8 grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {products
         .filter((product) => product.status === 1)
         .map((product) => (
@@ -37,7 +37,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
             id={product.id}
             name={product.name}
             price={product.price}
-            imageUrl={product.imageUrl}
+            linkImage={product.linkImage}
             size={product.size}
             status={product.status}
             quantity={cart[product.id] || 0}
