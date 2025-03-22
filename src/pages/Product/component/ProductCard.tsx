@@ -4,15 +4,17 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 
 interface ProductCardProps {
-  id: number;
+  id: string;
   name: string;
   price: number;
   imageUrl: string;
+  size: number;
+  status: number;
   quantity: number;
-  onAddToCart: (id: number) => void;
-  onIncrease: (id: number) => void;
-  onDecrease: (id: number) => void;
-  onRemoveFromCart: (id: number) => void;
+  onAddToCart: (id: string) => void;
+  onIncrease: (id: string) => void;
+  onDecrease: (id: string) => void;
+  onRemoveFromCart: (id: string) => void;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
@@ -20,21 +22,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   name,
   price,
   imageUrl,
+  size,
+  status,
   quantity,
   onAddToCart,
   onIncrease,
   onDecrease,
   onRemoveFromCart
 }) => {
-  // Format giá tiền thành VND
   const formatPrice = new Intl.NumberFormat('vi-VN', {
     style: 'currency',
     currency: 'VND'
   }).format(price);
 
   return (
-    <article className="flex h-[420px] w-[320px] flex-col overflow-hidden rounded-lg border border-gray-200 bg-white p-4 shadow-lg">
-      {/* Hình ảnh sản phẩm */}
+    <article className="flex h-[460px] w-[320px] flex-col overflow-hidden rounded-lg border border-gray-200 bg-white p-4 shadow-lg">
       <div className="relative h-60 w-full">
         <img
           src={imageUrl}
@@ -44,20 +46,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         />
       </div>
 
-      {/* Thông tin sản phẩm */}
       <div className="mt-4 flex-grow text-center">
         <h3 className="text-lg font-semibold">{name}</h3>
         <p className="text-gray-600">{formatPrice}</p>
+        <p className="mt-1 text-xs text-gray-400">Kho: {size} sản phẩm</p>
       </div>
 
-      {/* Nút giỏ hàng */}
       <div className="mt-auto flex flex-col items-center gap-2">
-        {quantity === 0 ? (
+        {status !== 1 ? (
+          <span className="font-semibold text-red-500">Hết hàng</span>
+        ) : quantity === 0 ? (
           <Button
             className="w-full rounded-lg bg-blue-600 py-2 text-white hover:bg-blue-700"
             onClick={() => onAddToCart(id)}
           >
-            + Add To Cart
+            + Thêm vào giỏ
           </Button>
         ) : (
           <div className="flex flex-col items-center gap-2">
@@ -80,7 +83,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
               onClick={() => onRemoveFromCart(id)}
             >
-              Remove
+              Xóa khỏi giỏ
             </Button>
           </div>
         )}

@@ -1,4 +1,5 @@
 import { ChevronDown, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,7 +7,37 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 
+interface ProductType {
+  id: string;
+  name: string;
+  description: string;
+}
+
 export default function Header() {
+  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+
+  useEffect(() => {
+    const fetchProductTypes = async () => {
+      try {
+        const response = await fetch(
+          'https://furever-dmgrecfgevadawew.southeastasia-01.azurewebsites.net/api/product-type/get-all'
+        );
+        const data = await response.json();
+        console.log('Fetched data:', data); // Kiểm tra dữ liệu trả về
+        setProductTypes(data.data || []);
+      } catch (error) {
+        console.error('Error fetching product types:', error);
+      }
+    };
+
+    fetchProductTypes();
+  }, []);
+
+  // Kiểm tra state
+  useEffect(() => {
+    console.log('Product Types state:', productTypes);
+  }, [productTypes]);
+
   return (
     <header className="w-full bg-[#e91e63] text-white">
       <div className="container flex h-16 items-center justify-between px-4 md:px-6">
@@ -27,21 +58,20 @@ export default function Header() {
               SẢN PHẨM <ChevronDown className="ml-1 h-4 w-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" className="bg-white">
-              <DropdownMenuItem>
-                <a href="/product" className="w-full">
-                  Thức ăn cho thú cưng
-                </a>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <a href="/product" className="w-full">
-                  Phụ kiện
-                </a>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <a href="/product" className="w-full">
-                  Đồ chơi
-                </a>
-              </DropdownMenuItem>
+              {productTypes.length === 0 ? (
+                <div className="p-2 text-center">Loading...</div> // Hiển thị thông báo nếu chưa có dữ liệu
+              ) : (
+                productTypes.map((productType) => (
+                  <DropdownMenuItem key={productType.id}>
+                    <a
+                      href={`/product?type=${productType.id}`}
+                      className="w-full"
+                    >
+                      {productType.name}
+                    </a>
+                  </DropdownMenuItem>
+                ))
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
