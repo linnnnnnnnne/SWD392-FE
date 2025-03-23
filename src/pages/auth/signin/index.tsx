@@ -1,8 +1,8 @@
 import UserAuthForm from './components/user-auth-form';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Link } from 'react-router-dom';
-import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,6 +11,47 @@ import { FaApple } from 'react-icons/fa';
 import loginImage from '@/assets/login.jpg';
 
 export default function SignInPage() {
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const loginData = { email, password };
+
+    try {
+      const response = await fetch(
+        'https://furever-dmgrecfgevadawew.southeastasia-01.azurewebsites.net/api/user/login',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(loginData)
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Login failed. Please check your credentials.');
+      }
+
+      const data = await response.json();
+
+      if (data.isSuccess && data.data.userID) {
+        localStorage.setItem('userId', data.data.userID);
+
+        navigate('/');
+      } else {
+        setError('Login failed. Invalid response from server.');
+      }
+    } catch (error) {
+      setError('Invalid email or password.');
+      console.error('Error during login:', error);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex w-1/2 items-center justify-center">
@@ -21,13 +62,22 @@ export default function SignInPage() {
           <p className="mb-6 text-gray-500">
             Nhập thông tin xác thực của bạn để truy cập account của bạn
           </p>
-          <form className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4">
             <Input
               placeholder="Email address"
               type="email"
               className="w-full"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
-            <Input placeholder="Password" type="password" className="w-full" />
+            <Input
+              placeholder="Password"
+              type="password"
+              className="w-full"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            {error && <p className="text-sm text-red-500">{error}</p>}
             <div className="flex items-center justify-between">
               <label className="flex items-center text-sm text-gray-600">
                 <input type="checkbox" className="mr-2" /> Remember for 30 days

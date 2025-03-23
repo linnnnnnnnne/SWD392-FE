@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
@@ -32,6 +32,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onRemoveFromCart
 }) => {
   const navigate = useNavigate();
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedUserId = localStorage.getItem('userId');
+    console.log('userId from localStorage:', storedUserId);
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
+  }, []);
 
   const handleProductClick = () => {
     navigate(`/product-detail/${id}`);

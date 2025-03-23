@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { formatCurrency } from '@/utilities/formatCurrency';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface CartSidebarProps {
   cart: { [key: string]: number };
@@ -16,12 +16,23 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
   onClose,
   onRemove
 }) => {
+  const [userId, setUserId] = useState<string>('');
+  const [addressDelivery, setAddressDelivery] = useState<string>('');
+  const [addressError, setAddressError] = useState<string>('');
+  const [note, setNote] = useState<string>('');
   const totalPrice = products.reduce(
     (acc: number, p: any) => acc + (cart[p.id] || 0) * p.price,
     0
   );
 
-  // update trong localStorage
+  useEffect(() => {
+    const storedUserId = localStorage.getItem('userId');
+    console.log('Retrieved userId from localStorage:', storedUserId);
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
+  }, []);
+
   useEffect(() => {
     if (Object.keys(cart).length > 0) {
       localStorage.setItem('cart', JSON.stringify(cart));
@@ -29,26 +40,59 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
   }, [cart]);
 
   const handleCheckout = async () => {
+    if (!userId || userId === 'undefined') {
+      window.location.href = '/login';
+      return;
+    }
+
+    if (!addressDelivery) {
+      setAddressError('Vui lòng nhập địa chỉ giao hàng');
+      return;
+    }
+
+    setAddressError('');
+
     const orderData = {
-      products: Object.entries(cart)
+      userId,
+      addressDelivery,
+      note,
+      orderDetails: Object.entries(cart)
         .map(([id, quantity]) => {
           const product = products.find((p) => p.id === id);
           return product
             ? {
-                id: product.id,
-                name: product.name,
-                linkImage: product.linkImage,
                 quantity,
-                price: product.price
+                productId: product.id
               }
             : null;
         })
-        .filter(Boolean),
-      total: totalPrice
+        .filter(Boolean)
     };
 
-    localStorage.setItem('orderData', JSON.stringify(orderData));
-    window.location.href = '/checkout';
+    console.log('Order data:', orderData);
+    try {
+      const response = await fetch(
+        'https://furever-dmgrecfgevadawew.southeastasia-01.azurewebsites.net/api/order/create',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(orderData)
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to place order');
+      }
+
+      const data = await response.json();
+      localStorage.removeItem('cart');
+      localStorage.setItem('orderData', JSON.stringify(data));
+      window.location.href = '/checkout';
+    } catch (error) {
+      console.error('Error placing order:', error);
+    }
   };
 
   return (
@@ -109,11 +153,30 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
           Tổng: {formatCurrency(totalPrice)}
         </p>
 
+        <div className="mt-4">
+          <input
+            type="text"
+            value={addressDelivery}
+            onChange={(e) => setAddressDelivery(e.target.value)}
+            placeholder="Địa chỉ giao hàng"
+            className={`mb-2 w-full border px-3 py-2 ${addressError ? 'border-red-500' : ''}`}
+          />
+          {addressError && (
+            <p className="text-sm text-red-500">{addressError}</p>
+          )}
+          <textarea
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Ghi chú (nếu có)"
+            className="mb-4 w-full border px-3 py-2"
+          />
+        </div>
+
         <Button
           className="mt-4 w-full rounded-md bg-blue-500 py-2 text-white hover:bg-blue-600"
           onClick={handleCheckout}
         >
-          Thanh toán
+          Đặt hàng
         </Button>
       </div>
     </div>
