@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import { Search, Heart, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,9 +11,100 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import Footer from '@/components/shared/footer';
+import { useCreateBooking, useGetAllPet } from '@/queries/admin.query';
+import { useParams } from 'react-router-dom';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function BookingPage() {
+  const { serviceId } = useParams();
+  const { data: dataPet } = useGetAllPet();
+
+  const [selectedPet, setSelectedPet] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedTime, setSelectedTime] = useState('');
+  const { mutateAsync: createBooking } = useCreateBooking();
+  const [formData, setFormData] = useState({
+    nameCustomerBooking: '',
+    phoneNumberCustomerBooking: '',
+    emailCustomerBooking: '',
+    addressGetPet: ''
+  });
+  const { toast } = useToast();
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData({
+      ...formData,
+      [id]: value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!selectedDate || !selectedTime || !selectedPet) {
+      alert('Vui lòng điền đầy đủ thông tin bắt buộc');
+      return;
+    }
+
+    try {
+      // Combine date and time
+      const dateObj = new Date(selectedDate);
+      const [hours, minutes] = selectedTime.split(':');
+      dateObj.setHours(Number.parseInt(hours), Number.parseInt(minutes), 0);
+
+      const bookingData = {
+        userID: '8de72b7a-6323-4c5d-a9a9-d8dbd0f280d0',
+        petId: selectedPet,
+        bookingDetails: [
+          {
+            serviceId: serviceId
+          }
+        ],
+        startTime: dateObj.toISOString(),
+        addressGetPet: formData.addressGetPet,
+        nameCustomerBooking: formData.nameCustomerBooking,
+        phoneNumberCustomerBooking: formData.phoneNumberCustomerBooking,
+        emailCustomerBooking: formData.emailCustomerBooking
+      };
+
+      console.log('Booking data:', bookingData);
+
+      // Call the createBooking mutation
+      const response = await createBooking(bookingData);
+
+      console.log('Booking created:', response);
+
+      if (response && response.paymentLink) {
+        window.open(response.paymentLink, '_blank');
+      } else {
+        toast({
+          title: 'Lịch đã bị trùng',
+          description: 'Lịch đã được đặt.',
+          variant: 'destructive',
+          duration: 5000
+        });
+      }
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      toast({
+        title: 'Đặt lịch thất bại',
+        description: 'Vui lòng thử lại sau.',
+        variant: 'destructive',
+        duration: 5000
+      });
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header */}
@@ -72,60 +166,129 @@ export default function BookingPage() {
               </p>
             </div>
 
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-2">
-                <label htmlFor="fullname" className="block">
+                <label htmlFor="nameCustomerBooking" className="block">
                   Họ và tên <span className="text-red-500">(*)</span>
                 </label>
-                <Input id="fullname" className="w-full" required />
+                <Input
+                  id="nameCustomerBooking"
+                  className="w-full"
+                  required
+                  value={formData.nameCustomerBooking}
+                  onChange={handleInputChange}
+                />
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="phone" className="block">
+                <label htmlFor="phoneNumberCustomerBooking" className="block">
                   Số điện thoại <span className="text-red-500">(*)</span>
                 </label>
-                <Input id="phone" className="w-full" required />
+                <Input
+                  id="phoneNumberCustomerBooking"
+                  className="w-full"
+                  required
+                  value={formData.phoneNumberCustomerBooking}
+                  onChange={handleInputChange}
+                />
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="petname" className="block">
-                  Tên của pet
+                <label htmlFor="emailCustomerBooking" className="block">
+                  Email <span className="text-red-500">(*)</span>
                 </label>
-                <Input id="petname" className="w-full" />
+                <Input
+                  id="emailCustomerBooking"
+                  type="email"
+                  className="w-full"
+                  required
+                  value={formData.emailCustomerBooking}
+                  onChange={handleInputChange}
+                />
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="date" className="block">
-                  Chọn ngày <span className="text-red-500">(*)</span>
+                <label htmlFor="addressGetPet" className="block">
+                  Địa chỉ đón thú cưng <span className="text-red-500">(*)</span>
                 </label>
-                <Select>
+                <Input
+                  id="addressGetPet"
+                  className="w-full"
+                  required
+                  value={formData.addressGetPet}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="pet" className="block">
+                  Chọn thú cưng <span className="text-red-500">(*)</span>
+                </label>
+                <Select onValueChange={setSelectedPet} required>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="1/3/2025" />
+                    <SelectValue placeholder="Chọn thú cưng của bạn" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1/3/2025">1/3/2025</SelectItem>
-                    <SelectItem value="2/3/2025">2/3/2025</SelectItem>
-                    <SelectItem value="3/3/2025">3/3/2025</SelectItem>
+                    {dataPet &&
+                      dataPet.map((pet) => (
+                        <SelectItem key={pet.id} value={pet.id}>
+                          {pet.name} ({pet.breed}, {pet.age} tuổi)
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="time" className="block">
-                  Chọn khung giờ <span className="text-red-500">(*)</span>
+                <label className="block">
+                  Chọn ngày và giờ <span className="text-red-500">(*)</span>
                 </label>
-                <Select>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="10:00" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="9:00">9:00</SelectItem>
-                    <SelectItem value="10:00">10:00</SelectItem>
-                    <SelectItem value="11:00">11:00</SelectItem>
-                    <SelectItem value="14:00">14:00</SelectItem>
-                    <SelectItem value="15:00">15:00</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+                  <div className="w-full sm:w-1/2">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant={'outline'}
+                          className={cn(
+                            'w-full justify-start text-left font-normal',
+                            !selectedDate && 'text-muted-foreground'
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {selectedDate ? (
+                            format(selectedDate, 'PPP')
+                          ) : (
+                            <span>Chọn ngày</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={selectedDate}
+                          onSelect={setSelectedDate}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  <div className="w-full sm:w-1/2">
+                    <Select onValueChange={setSelectedTime}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Chọn giờ" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="09:00">09:00</SelectItem>
+                        <SelectItem value="10:00">10:00</SelectItem>
+                        <SelectItem value="11:00">11:00</SelectItem>
+                        <SelectItem value="14:00">14:00</SelectItem>
+                        <SelectItem value="15:00">15:00</SelectItem>
+                        <SelectItem value="16:00">16:00</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -133,9 +296,9 @@ export default function BookingPage() {
                   Chọn hình thức thanh toán{' '}
                   <span className="text-red-500">(*)</span>
                 </label>
-                <Select>
+                <Select defaultValue="cash">
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Thanh toán online" />
+                    <SelectValue placeholder="Chọn hình thức thanh toán" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="online">Thanh toán online</SelectItem>

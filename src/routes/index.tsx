@@ -1,6 +1,5 @@
 import ScrollToTop from '@/hooks/scroll-to-top';
 import NotFound from '@/pages/not-found';
-import path from 'path';
 import { Suspense, lazy } from 'react';
 import { Navigate, Outlet, useRoutes } from 'react-router-dom';
 
@@ -31,10 +30,6 @@ export default function AppRouter() {
         </SystemLayout>
       ),
       children: [
-        // {
-        //   element: <>Home Page</>,
-        //   index: true
-        // },
         {
           path: '/',
           element: <Home />
@@ -47,20 +42,21 @@ export default function AppRouter() {
           path: '/product-detail/:id', // Define the product detail route
           element: <ProductDetail />
         },
+
         {
           path: '/store',
           element: <StorePage />
         },
         {
-          path: '/store/:id',
+          path: '/branch/:id',
           element: <StoreDetailPage />
         },
         {
-          path: '/store/:id/:serviceId',
+          path: '/services/:id',
           element: <PetService />
         },
         {
-          path: '/booking',
+          path: '/booking/:serviceId',
           element: <BookingPage />
         },
         {

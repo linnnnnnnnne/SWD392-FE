@@ -3,8 +3,8 @@ import helpers from '../helpers';
 
 const baseURL =
   process.env.NODE_ENV === 'production'
-    ? 'https://tamnguyendev23-001-site1.ntempurl.com/'
-    : 'https://localhost:7093/';
+    ? 'https://furever-dmgrecfgevadawew.southeastasia-01.azurewebsites.net/'
+    : 'https://furever-dmgrecfgevadawew.southeastasia-01.azurewebsites.net/';
 const token = helpers.cookie_get('AT');
 const onRequestSuccess = (config: any) => {
   config.headers['Authorization'] = `Bearer ${helpers.cookie_get('AT')}`;

@@ -1,19 +1,17 @@
+'use client';
+
 import BasePages from '@/components/shared/base-pages.js';
 import Footer from '@/components/shared/footer';
 import { Button } from '@/components/ui/button';
-import {
-  MapPin,
-  ArrowRight,
-  Filter,
-  ChevronRight,
-  Heart,
-  ShoppingCart
-} from 'lucide-react';
+import { MapPin, ArrowRight, Filter, Heart, ShoppingCart } from 'lucide-react';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useRouter } from '@/routes/hooks';
+import { useGetAllStore } from '@/queries/admin.query';
 export default function HomePage() {
   const router = useRouter();
+  const { data } = useGetAllStore();
+  console.log('data', data);
   return (
     <div className="">
       <BasePages
@@ -76,115 +74,61 @@ export default function HomePage() {
 
             {/* Store Grid */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {/* Pet Lover */}
-              <div className="overflow-hidden rounded-lg bg-purple-400">
-                <div className="p-4 text-white">
-                  <h3 className="mb-1 text-xl font-bold">Pet Lover</h3>
-                  <p className="mb-4 text-sm">
-                    48 Nguyễn Gia Trí, P4, Bình Thạnh
-                  </p>
-                  <div className="mb-2 h-40 overflow-hidden rounded bg-white">
-                    <img
-                      src="/placeholder.svg?height=160&width=240"
-                      alt="Vet with dog"
-                      width={240}
-                      height={160}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div className="flex justify-end">
-                    <Button
-                      variant="ghost"
-                      className="text-white hover:bg-purple-500"
-                      onClick={() => router.push('/store/1')}
-                    >
-                      <span>Xem cửa hàng</span>
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
+              {data?.map((storeData) => (
+                <div
+                  key={storeData.store.id}
+                  className="overflow-hidden rounded-lg bg-purple-400"
+                >
+                  <div className="p-4 text-white">
+                    <h3 className="mb-1 text-xl font-bold">
+                      {storeData.store.name}
+                    </h3>
 
-              {/* Thú Y K9 */}
-              <div className="overflow-hidden rounded-lg bg-purple-400">
-                <div className="p-4 text-white">
-                  <h3 className="mb-1 text-xl font-bold">Thú Y K9</h3>
-                  <p className="mb-4 text-sm">53 đường 3A, Bình Thạnh</p>
-                  <div className="mb-2 h-40 overflow-hidden rounded bg-white">
-                    <img
-                      src="/placeholder.svg?height=160&width=240"
-                      alt="Pet grooming"
-                      width={240}
-                      height={160}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div className="flex justify-end">
-                    <Button
-                      variant="ghost"
-                      className="text-white hover:bg-purple-500"
-                      onClick={() => router.push('/store/1')}
-                    >
-                      <span>Xem cửa hàng</span>
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
+                    {/* Display branches if available */}
+                    {storeData.branches.length > 0 ? (
+                      <div className="mb-4">
+                        {storeData.branches.map((branch) => (
+                          <div key={branch.id} className="mb-2">
+                            <p
+                              className="cursor-pointer text-sm font-medium transition-colors hover:text-purple-100 hover:underline"
+                              onClick={() =>
+                                router.push(`/branch/${branch.id}`)
+                              }
+                            >
+                              {branch.name}
+                            </p>
+                            <p className="text-[9px]">{branch.address}</p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="mb-4 text-sm italic">Không có chi nhánh</p>
+                    )}
 
-              {/* Pet Kingdom */}
-              <div className="overflow-hidden rounded-lg bg-purple-400">
-                <div className="p-4 text-white">
-                  <h3 className="mb-1 text-xl font-bold">Pet Kingdom</h3>
-                  <p className="mb-4 text-sm">147 Điện Biên Phủ, Bình Thạnh</p>
-                  <div className="mb-2 h-40 overflow-hidden rounded bg-white">
-                    <img
-                      src="/placeholder.svg?height=160&width=240"
-                      alt="Dog and cat"
-                      width={240}
-                      height={160}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div className="flex justify-end">
-                    <Button
-                      variant="ghost"
-                      className="text-white hover:bg-purple-500"
-                      onClick={() => router.push('/store/1')}
-                    >
-                      <span>Xem cửa hàng</span>
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
+                    <div className="mb-2 h-40 overflow-hidden rounded bg-white">
+                      <img
+                        src="/placeholder.svg?height=160&width=240"
+                        alt={storeData.store.name}
+                        width={240}
+                        height={160}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <div className="flex justify-end">
+                      <Button
+                        variant="ghost"
+                        className="text-white hover:bg-purple-500"
+                        onClick={() =>
+                          router.push(`/store/${storeData.store.id}`)
+                        }
+                      >
+                        <span>Xem cửa hàng</span>
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Nhà Của Boss */}
-              <div className="overflow-hidden rounded-lg bg-purple-400">
-                <div className="p-4 text-white">
-                  <h3 className="mb-1 text-xl font-bold">Nhà Của Boss</h3>
-                  <p className="mb-4 text-sm">20 Ung Văn Khiêm, Bình Thạnh</p>
-                  <div className="mb-2 h-40 overflow-hidden rounded bg-white">
-                    <img
-                      src="/placeholder.svg?height=160&width=240"
-                      alt="Pet house"
-                      width={240}
-                      height={160}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div className="flex justify-end">
-                    <Button
-                      variant="ghost"
-                      className="text-white hover:bg-purple-500"
-                      onClick={() => router.push('/store/1')}
-                    >
-                      <span>Xem cửa hàng</span>
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
 
             {/* Pagination */}
