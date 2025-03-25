@@ -12,7 +12,6 @@ interface CartSidebarProps {
 
 export const CartSidebar: React.FC<CartSidebarProps> = ({
   cart,
-  products,
   onClose,
   onRemove
 }) => {
@@ -20,6 +19,10 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
   const [addressDelivery, setAddressDelivery] = useState<string>('');
   const [addressError, setAddressError] = useState<string>('');
   const [note, setNote] = useState<string>('');
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
   const totalPrice = products.reduce(
     (acc: number, p: any) => acc + (cart[p.id] || 0) * p.price,
     0
@@ -38,6 +41,29 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
       localStorage.setItem('cart', JSON.stringify(cart));
     }
   }, [cart]);
+
+  // Fetch products from the API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(
+          'https://furever-dmgrecfgevadawew.southeastasia-01.azurewebsites.net/api/product/get-all'
+        );
+        const data = await res.json();
+        console.log('Fetched data:', data.data);
+
+        setProducts(data.data);
+      } catch (e) {
+        console.error('Lỗi fetch:', e);
+        setError('Không thể tải sản phẩm. Vui lòng thử lại sau.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const handleCheckout = async () => {
     if (!userId || userId === 'undefined') {
@@ -58,6 +84,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
       note,
       orderDetails: Object.entries(cart)
         .map(([id, quantity]) => {
+          console.log(`Searching for product with ID: ${id}`);
           const product = products.find((p) => p.id === id);
           return product
             ? {
@@ -87,13 +114,51 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
       }
 
       const data = await response.json();
-      localStorage.removeItem('cart');
-      localStorage.setItem('orderData', JSON.stringify(data));
-      window.location.href = '/checkout';
+      console.log('Order response data:', data);
+
+      const orderId = data.data.id;
+      console.log('Created order with orderId:', orderId);
+
+      if (!orderId) {
+        throw new Error('OrderId is undefined');
+      }
+
+      const vnPayUrl = `https://furever-dmgrecfgevadawew.southeastasia-01.azurewebsites.net/api/VNPay/create-payment-link?userId=${userId}&referenceId=${orderId}`;
+      console.log('VNPay request URL:', vnPayUrl);
+
+      const paymentResponse = await fetch(vnPayUrl, {
+        method: 'GET',
+        headers: {
+          accept: '*/*'
+        }
+      });
+
+      if (!paymentResponse.ok) {
+        throw new Error('Failed to create payment link');
+      }
+
+      const paymentData = await paymentResponse.json();
+      console.log('VNPay response:', paymentData);
+
+      const paymentLink = paymentData.data;
+      console.log('Payment link:', paymentLink);
+
+      if (paymentLink && paymentLink.startsWith('http')) {
+        window.open(paymentLink, '_blank');
+      } else {
+        console.error('Invalid payment link:', paymentLink);
+        alert(
+          'An error occurred while generating the payment link. Please try again later.'
+        );
+      }
     } catch (error) {
-      console.error('Error placing order:', error);
+      console.error('Error placing order or creating payment link:', error);
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading message until the products are fetched
+  }
 
   return (
     <div className="fixed right-0 top-0 z-50 h-full w-96 bg-white p-5 shadow-lg">
@@ -110,7 +175,10 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
         <div className="space-y-4">
           {Object.entries(cart).map(([id, quantity]) => {
             const product = products.find((p: any) => p.id === id);
-            if (!product) return null;
+            if (!product) {
+              console.error(`Product not found for id: ${id}`);
+              return null;
+            }
             return (
               <div
                 key={id}

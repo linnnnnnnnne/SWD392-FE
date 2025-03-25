@@ -1,7 +1,6 @@
-// D:\semester 7\SWD392\5\SWD392-FE\src\hooks\useProducts.ts
 import { useEffect, useState } from 'react';
 
-export const useProducts = (productType?: string) => {
+export const useProducts = (productTypeId?: string) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -9,18 +8,33 @@ export const useProducts = (productType?: string) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch(
-          'https://furever-dmgrecfgevadawew.southeastasia-01.azurewebsites.net/api/product/get-all'
-        );
+        let url = '';
+
+        if (productTypeId) {
+          // Fetch products by product type
+          url = `https://furever-dmgrecfgevadawew.southeastasia-01.azurewebsites.net/api/product/get-by-productType?productTypeId=${productTypeId}`;
+        } else {
+          // Fetch all products
+          url =
+            'https://furever-dmgrecfgevadawew.southeastasia-01.azurewebsites.net/api/product/get-all';
+        }
+
+        const res = await fetch(url, {
+          method: 'GET',
+          headers: {
+            accept: 'application/json'
+          }
+        });
         const data = await res.json();
-        console.log('Fetched data:', data.data); // Kiểm tra dữ liệu trả về
+        console.log('Fetched data:', data.data);
 
         let filtered = data.data.filter((p: any) => p.status === 1);
-        console.log('ProductType:', productType);
-        if (productType) {
+        console.log('ProductTypeId:', productTypeId);
+
+        if (productTypeId) {
           filtered = filtered.filter((p: any) => {
             console.log('Product Type ID:', p.productTypeId);
-            return String(p.productTypeId) === productType;
+            return String(p.productTypeId) === productTypeId;
           });
         }
 
@@ -34,7 +48,7 @@ export const useProducts = (productType?: string) => {
     };
 
     fetchProducts();
-  }, [productType]);
+  }, [productTypeId]);
 
   return { products, loading, error };
 };

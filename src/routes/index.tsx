@@ -6,6 +6,7 @@ import { Navigate, Outlet, useRoutes } from 'react-router-dom';
 const SystemLayout = lazy(() => import('@/components/layout/layout'));
 // const HomePage = lazy(() => import('@/pages/Store/index'));
 const Home = lazy(() => import('@/pages/home/home'));
+const SuccessPage = lazy(() => import('@/pages/home/SuccessPage'));
 const Product = lazy(() => import('@/pages/Product/pageProduct'));
 const ProductDetail = lazy(() => import('@/pages/Product/ProductDetail'));
 const StorePage = lazy(() => import('@/pages/Store/index'));
@@ -35,11 +36,15 @@ export default function AppRouter() {
           element: <Home />
         },
         {
+          path: '/success',
+          element: <SuccessPage />
+        },
+        {
           path: '/product',
           element: <Product />
         },
         {
-          path: '/product-detail/:id', // Define the product detail route
+          path: '/product-detail/:id',
           element: <ProductDetail />
         },
 

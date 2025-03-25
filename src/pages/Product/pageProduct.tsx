@@ -1,8 +1,7 @@
-// pageProduct
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+// import { useSearchParams } from 'next/navigation';
 import Footer from '@/components/shared/footer';
 import { ProductGrid } from './component/ProductGrid';
 import { Pagination } from './component/Pagination';
