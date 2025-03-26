@@ -8,10 +8,31 @@ import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useRouter } from '@/routes/hooks';
 import { useGetAllStore } from '@/queries/admin.query';
+
 export default function HomePage() {
   const router = useRouter();
   const { data } = useGetAllStore();
   console.log('data', data);
+
+  // Danh sách 5 hình ảnh mẫu (thay thế bằng đường dẫn thực tế trong dự án của bạn)
+  const sampleImages = [
+    'src/assets/Group 24.png',
+    'src/assets/image (1).png',
+    'src/assets/image (2).png',
+    'src/assets/Group 24.png',
+    'src/assets/image 29.png'
+  ];
+
+  // Nếu không có data từ API, dùng dữ liệu mẫu để hiển thị 5 cửa hàng
+  const fallbackData = Array(5)
+    .fill(null)
+    .map((_, index) => ({
+      store: { id: index + 1, name: `Cửa hàng ${index + 1}` },
+      branches: []
+    }));
+
+  const displayData = data || fallbackData;
+
   return (
     <div className="">
       <BasePages
@@ -74,7 +95,7 @@ export default function HomePage() {
 
             {/* Store Grid */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {data?.map((storeData) => (
+              {displayData.slice(0, 5).map((storeData, index) => (
                 <div
                   key={storeData.store.id}
                   className="overflow-hidden rounded-lg bg-purple-400"
@@ -107,7 +128,7 @@ export default function HomePage() {
 
                     <div className="mb-2 h-40 overflow-hidden rounded bg-white">
                       <img
-                        src="/placeholder.svg?height=160&width=240"
+                        src={sampleImages[index] || 'src/assets/Group 24.png'} // Sử dụng hình ảnh khác nhau cho mỗi div
                         alt={storeData.store.name}
                         width={240}
                         height={160}
