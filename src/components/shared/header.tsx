@@ -77,28 +77,14 @@ export default function Header() {
 
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center font-medium hover:underline">
-              DỊCH VỤ <ChevronDown className="ml-1 h-4 w-4" />
+              <a href="/store" className="font-medium hover:underline">
+                DỊCH VỤ
+              </a>
+              <ChevronDown className="ml-1 h-4 w-4" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="bg-white">
-              <DropdownMenuItem>
-                <a href="/dich-vu/spa" className="w-full">
-                  Spa & Grooming
-                </a>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <a href="/dich-vu/kham-benh" className="w-full">
-                  Khám bệnh
-                </a>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <a href="/dich-vu/trong-giu" className="w-full">
-                  Trông giữ thú cưng
-                </a>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
           </DropdownMenu>
 
-          <a href="/dang-ki" className="font-medium hover:underline">
+          <a href="/signup" className="font-medium hover:underline">
             ĐĂNG KÍ
           </a>
         </nav>

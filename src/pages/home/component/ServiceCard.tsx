@@ -25,9 +25,11 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
       <div className="flex-1 px-6">
         <h3 className="text-xl font-bold uppercase text-pink-600">{title}</h3>
         <p className="mt-2 text-gray-700">{description}</p>
-        <button className="mt-4 rounded-lg bg-[#A6E22E] px-6 py-2 font-bold text-black transition duration-300 hover:bg-[#8CD60D]">
-          XEM THÊM
-        </button>
+        <a href="/store">
+          <button className="mt-4 rounded-lg bg-[#A6E22E] px-6 py-2 font-bold text-black transition duration-300 hover:bg-[#8CD60D]">
+            XEM THÊM
+          </button>
+        </a>
       </div>
       {imagePosition === 'right' && (
         <img

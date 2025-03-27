@@ -1,9 +1,38 @@
-import DashboardLayout from '@/components/layout/layout';
+import { useEffect, useState } from 'react';
 import ProductCard from './component/ProductCard';
 import { ServiceCard } from './component/ServiceCard';
 import Footer from '@/components/shared/footer';
 
+type ProductType = {
+  id: string;
+  name: string;
+  description: string;
+  linkImage: string;
+};
+
 export default function Home() {
+  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+
+  // Fetch data from API
+  useEffect(() => {
+    fetch(
+      'https://furever-dmgrecfgevadawew.southeastasia-01.azurewebsites.net/api/product-type/get-all',
+      {
+        method: 'GET',
+        headers: {
+          accept: 'application/json'
+        }
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setProductTypes(data.data); // Assuming "data" contains the array of product types
+      })
+      .catch((error) => {
+        console.error('Error fetching product data:', error);
+      });
+  }, []);
+
   return (
     <div className="font-sans">
       {/* Banner */}
@@ -48,26 +77,19 @@ export default function Home() {
           SẢN PHẨM BÁN CHẠY
         </h2>
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-          <ProductCard
-            name="Thức ăn cho mèo"
-            price="120.000Đ"
-            image="https://cdn.builder.io/api/v1/image/assets/TEMP/814681664f73026d4b20bf23ef0ded1a1f125502e51d31996946884f308f0a06"
-          />
-          <ProductCard
-            name="Sữa bột cho chó mèo"
-            price="150.000Đ"
-            image="https://cdn.builder.io/api/v1/image/assets/TEMP/ba560e67b4bd4f9fe7a51e9c748fb2fe37fc419d74694580f8b018d3f127830e?placeholderIfAbsent=true&apiKey=87394bd0cd7a4add8bf680009e12faa5"
-          />
-          <ProductCard
-            name="Thức ăn cho chó con"
-            price="140.000Đ"
-            image="https://cdn.builder.io/api/v1/image/assets/TEMP/b7288db10915ff129e45c167584d28a6a9c8f300d99e8d65801b1f346ca0b256?placeholderIfAbsent=true&apiKey=87394bd0cd7a4add8bf680009e12faa5"
-          />
-          <ProductCard
-            name="Thức ăn cho mèo cao cấp"
-            price="300.000Đ"
-            image="https://cdn.builder.io/api/v1/image/assets/TEMP/ee5d05e48abd2e930b7b99601d1761d280a0fe7e9f63dba3bbc596c8f2ffe792?placeholderIfAbsent=true&apiKey=87394bd0cd7a4add8bf680009e12faa5"
-          />
+          {productTypes.length === 0 ? (
+            <div className="col-span-4 text-center">Loading...</div>
+          ) : (
+            productTypes.map((product) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                description={product.description}
+                linkImage={product.linkImage}
+              />
+            ))
+          )}
         </div>
       </section>
 
