@@ -17,7 +17,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     <div className="rounded-lg border bg-white p-4 text-center shadow-lg">
       <img
         src={linkImage}
-        className="h-150 w-full rounded-md object-cover"
+        className="mx-auto h-[300px] w-[300px] rounded-md object-cover"
         alt={name}
       />
       <h3 className="mt-2 text-lg font-bold">{name}</h3>

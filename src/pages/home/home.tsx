@@ -74,7 +74,7 @@ export default function Home() {
       {/* Sản phẩm bán chạy */}
       <section className="p-8">
         <h2 className="mb-6 text-center text-3xl font-bold">
-          SẢN PHẨM BÁN CHẠY
+          DANH MỤC SẢN PHẨM
         </h2>
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
           {productTypes.length === 0 ? (

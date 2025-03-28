@@ -90,7 +90,7 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center space-x-4">
-          <a href="/account" className="text-white">
+          <a href="login" className="text-white">
             <User className="h-6 w-6" />
           </a>
 
